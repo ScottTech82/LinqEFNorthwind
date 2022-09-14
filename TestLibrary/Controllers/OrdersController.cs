@@ -1,4 +1,5 @@
 ﻿using LinqEFNorthwindLibrary.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,51 +17,50 @@ namespace LinqEFNorthwindLibrary.Controllers
             _context = context;
         }
 
-        public IEnumerable<Order> GetAll()
+        public async Task<IEnumerable<Order>> GetAll()
         {
-            return _context.Orders;
+            return await _context.Orders.ToListAsync();
         }
 
-        public Order? GetByPK(int OrderId)
+        public async Task<Order?> GetByPK(int OrderId)
         {
 
-            return _context.Orders.Find(OrderId);
+            return await _context.Orders.FindAsync(OrderId);
 
         }
 
-        public void Update(int OrderId, Order order)
+        public async Task Update(int OrderId, Order order)
         {
             if(OrderId != order.OrderId)
             {
                 throw new ArgumentException("Primary key does not match.");
             }
             _context.Entry(order).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return;
         }
 
-        public Order Insert(Order order)
+        public async Task<Order> Insert(Order order)
         {
             if(order.OrderId != 0)
             {
                 throw new ArgumentException("Inserting new order requires orderId to be zero.");
             }
             _context.Orders.Add(order);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return order;
         }
 
-        public void Delete(int OrderId)
+        public async Task Delete(int OrderId)
         {
-            Order? orderx = GetByPK(OrderId);
+            Order? orderx = await GetByPK(OrderId);
             if (orderx is null)
             {
                 throw new Exception("Product not found.");
             }
             _context.Orders.Remove(orderx);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
-
 
 
 

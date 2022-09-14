@@ -14,17 +14,17 @@ namespace LinqEFNorthwindLibrary.Controllers
 
         public ProductsController(LinqAppContext context) { _context = context; }
 
-        public IEnumerable<Product> GetAll()
+        public async Task<IEnumerable<Product>> GetAll()
         {
-            return _context.Products; //could do an order by here
+            return await _context.Products.ToListAsync(); //could do an order by here
         }
 
-        public Product? GetByPK(int ProductId)
+        public async Task<Product?> GetByPK(int ProductId)
         {
-            return _context.Products.Find(ProductId);
+            return await _context.Products.FindAsync(ProductId);
         }
 
-        public void Update(int ProductId, Product product)
+        public async Task Update(int ProductId, Product product)
         {
             if (ProductId != product.ProductId)
             {
@@ -32,31 +32,31 @@ namespace LinqEFNorthwindLibrary.Controllers
             }
             //the only way EntityFramework can see the changes have been done.
             _context.Entry(product).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return;
         }
 
-        public Product Insert(Product product)
+        public async Task<Product> Insert(Product product)
         {
             if (product.ProductId != 0)
             {
                 throw new ArgumentException("ProductId must be set to 0");
             }
             _context.Products.Add(product);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return product;
 
         }
 
-        public void Delete(int ProductId)
+        public async Task Delete(int ProductId)
         {
-            Product? prod = GetByPK(ProductId);
+            Product? prod = await GetByPK(ProductId);
             if (prod is null)
             {
                 throw new Exception("Product not found.");
             }
             _context.Products.Remove(prod);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
 
